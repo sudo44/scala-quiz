@@ -53,18 +53,22 @@ sealed trait Node {
  * @param right 右の[[Node]]
  */
 case class Branch(left: Node, value: Int, right: Node) extends Node {
+  val size: Int = left.size + 1 + right.size
 
-  val size: Int = ???
+  val sum: Int = left.sum + value + right.sum
 
-  val sum: Int = ???
+  val avg: Double = sum / size
 
-  val avg: Double = ???
+  val max: Int = right.max
 
-  val max: Int = ???
+  val min: Int = left.min
 
-  val min: Int = ???
+  def find(value: Int): Option[Node] =
+    if (value == this.value) Some(this)
+    else if (value < this.value) left.find(value)
+    else right.find(value)
 
-  def find(value: Int): Option[Node] = ???
+
 
 }
 
@@ -74,18 +78,20 @@ case class Branch(left: Node, value: Int, right: Node) extends Node {
  * @param value 値
  */
 case class Leaf(value: Int) extends Node {
+  val size: Int = 1
 
-  val size: Int = ???
+  val sum: Int = value
 
-  val sum: Int = ???
+  val avg: Double = value
 
-  val avg: Double = ???
+  val max: Int = value
 
-  val max: Int = ???
+  val min: Int = value
 
-  val min: Int = ???
+  def find(value: Int): Option[Node] =
+    if (sum == value) Some(this)
+    else None
 
-  def find(value: Int): Option[Node] = ???
 
 }
 
