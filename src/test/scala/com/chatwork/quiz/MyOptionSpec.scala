@@ -37,6 +37,9 @@ class MyOptionSpec extends FunSpec with Matchers {
     it("should return the result of applying f") {
       MySome(100).flatMap(e => MySome(e * 2)) shouldBe MySome(200)
     }
+    it("should return the result of applying f (list)") {
+      MySome(List(1, 2, 3)).flatMap(e => MySome(e.sum)) shouldBe MySome(6)
+    }
     it("should return MyNone if it is empty") {
       MyNone.flatMap(_ => MySome(false)) shouldBe MyNone
     }
