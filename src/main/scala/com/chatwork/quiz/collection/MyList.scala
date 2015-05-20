@@ -1,6 +1,6 @@
 package com.chatwork.quiz.collection
 
-import com.chatwork.quiz.MyOption
+import com.chatwork.quiz.{MySome, MyNone, MyOption}
 
 import scala.annotation.tailrec
 
@@ -10,48 +10,105 @@ sealed trait MyList[+A] {
   def length: Int = {
     @tailrec
     def loop(num: Int, list: MyList[A]): Int = list match {
-      case MyNil  => num
+      case MyNil         => num
       case MyCons(x, xs) => loop(num + 1, xs)
     }
     loop(0, this)
   }
 
   // Normal
-  def foldLeft[B](z: B)(f: (B, A) => B): B = ???
+  def foldLeft[B](z: B)(f: (B, A) => B): B = {
+    @tailrec
+    def loop(result: B, myList: MyList[A]):B = myList match {
+      case MyNil => result
+      case MyCons(x, xs) => loop(f(result, x), xs)
+    }
+    loop(z, this)
+  }
 
   // 難易度選択制
   // Normal: 条件 - 特にありません、気の向くままに実装してください。
   // Hard:   条件 - foldLeftを使って実装してください。
-  def foldRight[B](z: B)(f: (A, B) => B): B = ???
+  def foldRight[B](z: B)(f: (A, B) => B): B = {
+    @tailrec
+    def loop(result: B, myList: MyList[A]):B = myList match {
+      case MyNil => result
+      case MyCons(x, xs) => loop(f(x, result), xs)
+    }
+    loop(z, this.reverse)
+//    reverse.foldLeft(z)(f)
+  }
 
   // Normal
   // scalastyle:off
-  def ::[B >: A](b: B): MyList[B] = ???
+  def ::[B >: A](b: B): MyList[B] = {
+    MyCons(b, this)
+  }
   // scalastyle:on
 
   // Normal
-  def reverse: MyList[A] = ???
+  def reverse: MyList[A] = {
+    @tailrec
+    def loop(result: MyList[A], myList: MyList[A]): MyList[A] = myList match {
+      case MyNil => result
+      case MyCons(x, xs) => loop(MyCons(x, result), xs)
+    }
+    loop(MyNil, this)
+  }
 
   // Normal
   // scalastyle:off
-  def ++[B >: A](b: MyList[B]): MyList[B] = ???
+  def ++[B >: A](b: MyList[B]): MyList[B] = {
+    @tailrec
+    def loop(result: MyList[B], myList: MyList[A]): MyList[B] = myList match {
+      case MyNil => result
+      case MyCons(x, xs) => loop(MyCons(x, result), xs)
+    }
+    loop(b,this.reverse)
+  }
   // scalastyle:on
 
   // Normal
-  def map[B](f: A => B): MyList[B] = ???
+  def map[B](f: A => B): MyList[B] = {
+    @tailrec
+    def loop(result: MyList[B], myList: MyList[A]): MyList[B] = myList match {
+      case MyNil => result
+      case MyCons(x, xs) => loop(MyCons(f(x), result), xs)
+    }
+    loop(MyNil, this.reverse)
+  }
 
   // Normal
-  def flatMap[B](f: A => MyList[B]): MyList[B] = ???
+  def flatMap[B](f: A => MyList[B]): MyList[B] = {
+    @tailrec
+    def loop(result: MyList[B], myList: MyList[A]): MyList[B] = myList match {
+      case MyNil => result
+      case MyCons(x, xs) => loop(result ++ f(x), xs)
+    }
+    loop(MyNil, this)
+  }
 
   // Normal
-  def filter(f: A => Boolean): MyList[A] = ???
+  def filter(f: A => Boolean): MyList[A] = {
+    @tailrec
+    def loop(result: MyList[A], myList: MyList[A]): MyList[A] = myList match {
+      case MyNil => result
+      case MyCons(x, xs) if f(x) => loop(MyCons(x, result), xs)
+      case MyCons(x, xs) => loop(result, xs)
+    }
+    loop(MyNil, this.reverse)
+  }
 
   // Normal: 条件 - filterと同様の実装でも構いません。
   // Hard:   条件 - 中間リストを生成しないように実装してください。
-  def withFilter(f: A => Boolean): MyList[A] = ???
+  def withFilter(f: A => Boolean): MyList[A] = filter(f)
 
   // Normal
-  def find(f: A => Boolean): MyOption[A] = ???
+  def find(f: A => Boolean): MyOption[A] = this match {
+    case MyNil => MyNone
+    case MyCons(x, xs) if f(x) => MySome(x)
+    case MyCons(x, xs) => xs.find(f)
+  }
 
   // Normal
   def startsWith[B >: A](prefix: MyList[B]): Boolean = ???
