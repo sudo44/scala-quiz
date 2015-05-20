@@ -12,6 +12,13 @@ class MyListSpec extends FunSpec with Matchers {
     }
   }
 
+  describe("MyList#length") {
+    it("should count size") {
+      MyList(1, 2, 3).length shouldEqual 3
+      MyList().length shouldEqual 0
+    }
+  }
+
   describe("MyList#foldLeft") {
     it("should apply an operator a start value and all elements from left to right") {
       MyList("H", "e", "l", "l", "o").foldLeft("Say ") { _ + _ } shouldEqual "Say Hello"

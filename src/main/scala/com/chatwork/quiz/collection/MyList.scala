@@ -2,10 +2,19 @@ package com.chatwork.quiz.collection
 
 import com.chatwork.quiz.MyOption
 
+import scala.annotation.tailrec
+
 sealed trait MyList[+A] {
 
   // Easy
-  def length: Int = ???
+  def length: Int = {
+    @tailrec
+    def loop(num: Int, list: MyList[A]): Int = list match {
+      case MyNil  => num
+      case MyCons(x, xs) => loop(num + 1, xs)
+    }
+    loop(0, this)
+  }
 
   // Normal
   def foldLeft[B](z: B)(f: (B, A) => B): B = ???
@@ -56,9 +65,16 @@ case class MyCons[+A](head: A, tail: MyList[A]) extends MyList[A]
 object MyList {
 
   // Easy
-  def empty[A]: MyList[A] = ???
+  def empty[A]: MyList[A] = MyNil
 
   // Normal
-  def apply[A](as: A*): MyList[A] = ???
+  def apply[A](as: A*): MyList[A] = {
+    @tailrec
+    def loop(list: MyList[A], as: A*): MyList[A] = {
+      if (as.isEmpty) list
+      else loop(MyCons(as.head, list), as.tail: _*)
+    }
+    loop(empty, as.reverse: _*)
+  }
 
 }
